@@ -226,6 +226,40 @@ Solved via status endpoint and optimistic UI update.
 
 ---
 
+## Environment Variables
+
+The backend requires two environment variables:
+
+- DATABASE_URL
+- ANTHROPIC_API_KEY
+
+This project uses Supabase (Session Pooler, URI format).
+
+Example format:
+
+DATABASE_URL=postgresql://username:password@host:5432/postgres?sslmode=require
+
+---
+
+### Option 1 – Using a `.env` file (recommended)
+
+Create a `.env` file inside `nectar-backend/` and copy values from `.env.example`.
+
+---
+
+### Option 2 – Setting environment variables manually (Windows)
+
+You can set them using:
+
+setx DATABASE_URL "your_database_url"
+setx ANTHROPIC_API_KEY "your_api_key"
+
+Then restart your terminal before running:
+
+go run cmd/main.go
+
+Note: Secrets are excluded from version control for security reasons.
+
 ## Deployment
 
 Frontend: Vercel-ready  
