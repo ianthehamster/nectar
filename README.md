@@ -13,6 +13,19 @@ The goal was to simulate Nectar AI’s “Social Loop” and build a compelling 
 
 ---
 
+## Live Demo
+
+It takes about 5 minutes for the app to start.
+
+Frontend (Vercel):  
+https://nectar-git-main-kit-ian-chows-projects.vercel.app/
+
+Backend API (Render):  
+https://nectar-12w2.onrender.com
+
+GitHub Repository:  
+https://github.com/ianthehamster/nectar
+
 ## Competitor Research
 
 Before building, I studied:
@@ -262,9 +275,19 @@ Note: Secrets are excluded from version control for security reasons.
 
 ## Deployment
 
-Frontend: Vercel-ready  
-Backend: Deployable to Railway / Fly.io / Render  
-Database: PostgreSQL
+Frontend:  
+Deployed on Vercel  
+https://nectar-git-main-kit-ian-chows-projects.vercel.app/
+
+Backend:  
+Deployed on Render  
+https://nectar-12w2.onrender.com
+
+Database:  
+PostgreSQL (Supabase Session Pooler)
+
+Note:
+The Render free tier may experience a brief cold start delay on the first request.
 
 ---
 
