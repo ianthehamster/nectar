@@ -2,9 +2,6 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { leapfrog } from 'ldrs';
-
-leapfrog.register();
 
 export default function ChatPage() {
   const { companionId } = useParams();
@@ -13,6 +10,13 @@ export default function ChatPage() {
     content: string;
     is_user: boolean;
   };
+
+  useEffect(() => {
+    (async () => {
+      const mod = await import('ldrs');
+      mod.leapfrog.register();
+    })();
+  }, []);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');

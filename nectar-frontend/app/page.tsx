@@ -2,9 +2,6 @@
 import { useRouter } from 'next/navigation';
 
 import { useEffect, useState, useRef } from 'react';
-import { reuleaux } from 'ldrs';
-
-reuleaux.register();
 
 type Companion = {
   id: number;
@@ -46,6 +43,13 @@ export default function Home() {
       setToast(null);
     }, 2000);
   };
+
+  useEffect(() => {
+    (async () => {
+      const mod = await import('ldrs');
+      mod.reuleaux.register();
+    })();
+  }, []);
 
   const refreshUnread = async () => {
     try {
