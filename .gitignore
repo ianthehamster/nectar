@@ -1,0 +1,23 @@
+# Node
+node_modules/
+.next/
+out/
+.env
+.env.local
+
+# Go
+bin/
+tmp/
+vendor/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
