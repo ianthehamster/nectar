@@ -247,299 +247,305 @@ export default function Home() {
         </div>
       )}
       {!loadingStories && (
-        <main className="min-h-screen bg-gradient-to-b from-black to-gray-950 text-white p-4">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">Stories</h1>
-            <div
-              className="relative cursor-pointer"
-              onClick={() => router.push('/chat')}
-            >
-              <span className="text-xl">💌</span>
-              {unread > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-xs px-2 py-0.5 rounded-full">
-                  {unread}
-                </span>
-              )}
-            </div>
-          </div>
+        // <main className="min-h-screen bg-gradient-to-b from-black to-gray-950 text-white p-4">
+        <main className="min-h-screen bg-gradient-to-b from-black to-gray-950 text-white">
+          <div className="max-w-6xl mx-auto px-4 py-6">
+            <div className="grid grid-cols-3 items-center mb-6">
+              <div />
 
-          <div className="flex space-x-4 overflow-x-auto">
-            {Array.isArray(companions) &&
-              companions.map((companion) => {
-                const status = Array.isArray(storyStatus)
-                  ? storyStatus.find((s) => {
-                      const cid = Number(
-                        s.companion_id ?? s.companionId ?? s.companionID,
-                      );
-                      return cid === Number(companion.id);
-                    })
-                  : null;
+              <h1 className="text-2xl font-bold text-center">Stories</h1>
 
-                const total = status
-                  ? Number(status.total ?? status.Total ?? status.story_total)
-                  : 0;
-                const viewed = status
-                  ? Number(
-                      status.viewed ?? status.Viewed ?? status.viewed_count,
-                    )
-                  : 0;
-
-                const allSeenBackend = total > 0 && viewed >= total;
-                const allSeen =
-                  allSeenBackend || seenCompanions.has(companion.id);
-
-                return (
-                  <div
-                    key={companion.id}
-                    className="flex flex-col items-center cursor-pointer"
-                    onClick={() => openStory(companion.id)}
-                  >
-                    <div
-                      className={`w-20 h-20 rounded-full p-1 border-4 ${
-                        allSeen ? 'border-gray-500' : 'border-pink-500'
-                      }`}
-                    >
-                      <img
-                        src={companion.avatar_url}
-                        alt={companion.name}
-                        className="w-full h-full rounded-full object-cover"
-                      />
-                    </div>
-                    <span className="mt-2 text-sm">{companion.name}</span>
-                  </div>
-                );
-              })}
-          </div>
-
-          {/* Story Modal */}
-          {story && story.items && story.items.length > 0 && (
-            <div
-              className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50"
-              onMouseDown={() => setPaused(true)}
-              onMouseUp={() => setPaused(false)}
-              onTouchStart={() => setPaused(true)}
-              onTouchEnd={() => setPaused(false)}
-            >
-              <div className="relative w-full h-full md:w-[400px] md:h-[700px]">
-                {/* Click zones */}
-                <div
-                  className="absolute left-0 top-0 w-1/2 h-full z-10"
-                  onClick={prev}
-                />
-                <div
-                  className="absolute right-0 top-0 w-1/2 h-full z-10"
-                  onClick={next}
-                />
-
-                <div className="absolute top-4 left-2 right-2 flex space-x-1 z-20">
-                  {story.items.map((_, index) => (
-                    <div
-                      key={index}
-                      className="flex-1 bg-gray-700 h-1 rounded overflow-hidden"
-                    >
-                      <div
-                        className="h-1 bg-white transition-all duration-100"
-                        style={{
-                          width:
-                            index < currentIndex
-                              ? '100%'
-                              : index === currentIndex
-                                ? `${progress}%`
-                                : '0%',
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-
-                {/* Media */}
-                {story.items && story.items.length > 0 && (
-                  <>
-                    {story.items[currentIndex]?.media_type === 'image' ? (
-                      <img
-                        src={story.items[currentIndex]?.media_url}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <video
-                        src={story.items[currentIndex]?.media_url}
-                        autoPlay
-                        onEnded={next}
-                        className="w-full h-full object-cover"
-                      />
-                    )}
-
-                    {/* Caption */}
-                    <div className="absolute bottom-10 left-4 right-4 text-white text-lg">
-                      {story.items[currentIndex]?.caption}
-                    </div>
-                  </>
+              <div
+                className="relative cursor-pointer justify-self-end"
+                onClick={() => router.push('/chat')}
+              >
+                <span className="text-xl">💌</span>
+                {unread > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-xs px-2 py-0.5 rounded-full">
+                    {unread}
+                  </span>
                 )}
-
-                <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-6 z-20">
-                  {['❤️', '🔥', '❤️‍🔥'].map((reaction) => (
-                    <button
-                      key={reaction}
-                      onClick={async () => {
-                        await fetch(
-                          `${process.env.NEXT_PUBLIC_API_URL}/stories/react`,
-                          {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                              story_item_id: story.items[currentIndex].id,
-                              reaction_type: reaction,
-                            }),
-                          },
-                        );
-
-                        // ✅ refresh 💌 badge
-                        refreshUnread();
-
-                        triggerFloatingReaction(reaction);
-                      }}
-                      className="text-2xl"
-                    >
-                      {reaction}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Close button */}
-                <button
-                  onClick={closeStory}
-                  className="absolute top-4 right-4 text-white text-xl"
-                >
-                  ✕
-                </button>
-                <div className="absolute bottom-20 left-1/2 -translate-x-1/2 pointer-events-none">
-                  {floatingReactions.map((r) => (
-                    <div
-                      key={r.id}
-                      className="text-4xl animate-float absolute"
-                      style={{ left: `calc(50% + ${r.offset}px)` }}
-                    >
-                      {r.emoji}
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
-          )}
-          <section className="mt-8 relative rounded-2xl overflow-hidden animate-fade-up">
-            <img
-              src={companions[0]?.avatar_url}
-              className="w-full h-[280px] object-cover opacity-70"
-            />
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent p-6 flex flex-col justify-end">
-              <h2 className="text-2xl font-bold">
-                {companions[0]?.name} posted something for you
+            <div className="flex gap-4 overflow-x-auto md:justify-center md:overflow-visible">
+              {Array.isArray(companions) &&
+                companions.map((companion) => {
+                  const status = Array.isArray(storyStatus)
+                    ? storyStatus.find((s) => {
+                        const cid = Number(
+                          s.companion_id ?? s.companionId ?? s.companionID,
+                        );
+                        return cid === Number(companion.id);
+                      })
+                    : null;
+
+                  const total = status
+                    ? Number(status.total ?? status.Total ?? status.story_total)
+                    : 0;
+                  const viewed = status
+                    ? Number(
+                        status.viewed ?? status.Viewed ?? status.viewed_count,
+                      )
+                    : 0;
+
+                  const allSeenBackend = total > 0 && viewed >= total;
+                  const allSeen =
+                    allSeenBackend || seenCompanions.has(companion.id);
+
+                  return (
+                    <div
+                      key={companion.id}
+                      className="flex flex-col items-center cursor-pointer"
+                      onClick={() => openStory(companion.id)}
+                    >
+                      <div
+                        className={`w-20 h-20 rounded-full p-1 border-4 ${
+                          allSeen ? 'border-gray-500' : 'border-pink-500'
+                        }`}
+                      >
+                        <img
+                          src={companion.avatar_url}
+                          alt={companion.name}
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      </div>
+                      <span className="mt-2 text-sm">{companion.name}</span>
+                    </div>
+                  );
+                })}
+            </div>
+
+            {/* Story Modal */}
+            {story && story.items && story.items.length > 0 && (
+              <div
+                className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50"
+                onMouseDown={() => setPaused(true)}
+                onMouseUp={() => setPaused(false)}
+                onTouchStart={() => setPaused(true)}
+                onTouchEnd={() => setPaused(false)}
+              >
+                <div className="relative w-full h-full md:w-[400px] md:h-[700px]">
+                  {/* Click zones */}
+                  <div
+                    className="absolute left-0 top-0 w-1/2 h-full z-10"
+                    onClick={prev}
+                  />
+                  <div
+                    className="absolute right-0 top-0 w-1/2 h-full z-10"
+                    onClick={next}
+                  />
+
+                  <div className="absolute top-4 left-2 right-2 flex space-x-1 z-20">
+                    {story.items.map((_, index) => (
+                      <div
+                        key={index}
+                        className="flex-1 bg-gray-700 h-1 rounded overflow-hidden"
+                      >
+                        <div
+                          className="h-1 bg-white transition-all duration-100"
+                          style={{
+                            width:
+                              index < currentIndex
+                                ? '100%'
+                                : index === currentIndex
+                                  ? `${progress}%`
+                                  : '0%',
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Media */}
+                  {story.items && story.items.length > 0 && (
+                    <>
+                      {story.items[currentIndex]?.media_type === 'image' ? (
+                        <img
+                          src={story.items[currentIndex]?.media_url}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <video
+                          src={story.items[currentIndex]?.media_url}
+                          autoPlay
+                          onEnded={next}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+
+                      {/* Caption */}
+                      <div className="absolute bottom-10 left-4 right-4 text-white text-lg">
+                        {story.items[currentIndex]?.caption}
+                      </div>
+                    </>
+                  )}
+
+                  <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-6 z-20">
+                    {['❤️', '🔥', '❤️‍🔥'].map((reaction) => (
+                      <button
+                        key={reaction}
+                        onClick={async () => {
+                          await fetch(
+                            `${process.env.NEXT_PUBLIC_API_URL}/stories/react`,
+                            {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                story_item_id: story.items[currentIndex].id,
+                                reaction_type: reaction,
+                              }),
+                            },
+                          );
+
+                          // ✅ refresh 💌 badge
+                          refreshUnread();
+
+                          triggerFloatingReaction(reaction);
+                        }}
+                        className="text-2xl"
+                      >
+                        {reaction}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Close button */}
+                  <button
+                    onClick={closeStory}
+                    className="absolute top-4 right-4 text-white text-xl"
+                  >
+                    ✕
+                  </button>
+                  <div className="absolute bottom-20 left-1/2 -translate-x-1/2 pointer-events-none">
+                    {floatingReactions.map((r) => (
+                      <div
+                        key={r.id}
+                        className="text-4xl animate-float absolute"
+                        style={{ left: `calc(50% + ${r.offset}px)` }}
+                      >
+                        {r.emoji}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            <section className="mt-8 relative rounded-2xl overflow-hidden animate-fade-up">
+              <img
+                src={companions[0]?.avatar_url}
+                className="w-full h-[280px] object-cover opacity-70"
+              />
+
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent p-6 flex flex-col justify-end">
+                <h2 className="text-2xl font-bold">
+                  {companions[0]?.name} posted something for you
+                </h2>
+
+                <p className="text-gray-300 text-sm mt-2">
+                  Tap to see her latest moment.
+                </p>
+
+                <button
+                  onClick={() => openStory(companions[0]?.id)}
+                  className="mt-4 bg-pink-600 px-5 py-2 rounded-full w-fit hover:bg-pink-500 transition"
+                >
+                  View Story
+                </button>
+              </div>
+            </section>
+
+            <section className="mt-10 animate-fade-up">
+              <h2 className="text-lg font-semibold mb-4">
+                Your Connection Levels
               </h2>
 
-              <p className="text-gray-300 text-sm mt-2">
-                Tap to see her latest moment.
-              </p>
+              <div className="space-y-4">
+                {companions.map((companion) => {
+                  const level = Math.floor(Math.random() * 100); // temp scoring logic
 
-              <button
-                onClick={() => openStory(companions[0]?.id)}
-                className="mt-4 bg-pink-600 px-5 py-2 rounded-full w-fit hover:bg-pink-500 transition"
-              >
-                View Story
-              </button>
-            </div>
-          </section>
+                  return (
+                    <div
+                      key={companion.id}
+                      className="bg-gray-900 rounded-xl p-4"
+                    >
+                      <div className="flex justify-between mb-2">
+                        <span>{companion.name}</span>
+                        <span className="text-pink-400 text-sm">
+                          Level {Math.floor(level / 20) + 1}
+                        </span>
+                      </div>
 
-          <section className="mt-10 animate-fade-up">
-            <h2 className="text-lg font-semibold mb-4">
-              Your Connection Levels
-            </h2>
-
-            <div className="space-y-4">
-              {companions.map((companion) => {
-                const level = Math.floor(Math.random() * 100); // temp scoring logic
-
-                return (
-                  <div
-                    key={companion.id}
-                    className="bg-gray-900 rounded-xl p-4"
-                  >
-                    <div className="flex justify-between mb-2">
-                      <span>{companion.name}</span>
-                      <span className="text-pink-400 text-sm">
-                        Level {Math.floor(level / 20) + 1}
-                      </span>
+                      <div className="w-full bg-gray-700 h-2 rounded-full">
+                        <div
+                          className="bg-pink-500 h-2 rounded-full transition-all"
+                          style={{ width: `${level}%` }}
+                        />
+                      </div>
                     </div>
+                  );
+                })}
+              </div>
+            </section>
 
-                    <div className="w-full bg-gray-700 h-2 rounded-full">
-                      <div
-                        className="bg-pink-500 h-2 rounded-full transition-all"
-                        style={{ width: `${level}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
+            <section className="mt-10 animate-fade-up">
+              <h2 className="text-lg font-semibold mb-4">Daily Moment</h2>
 
-          <section className="mt-10 animate-fade-up">
-            <h2 className="text-lg font-semibold mb-4">Daily Moment</h2>
+              <div className="bg-gradient-to-r from-pink-600/20 to-purple-600/20 p-5 rounded-xl">
+                <p className="text-gray-300">Nova asks:</p>
 
-            <div className="bg-gradient-to-r from-pink-600/20 to-purple-600/20 p-5 rounded-xl">
-              <p className="text-gray-300">Nova asks:</p>
-
-              <p className="mt-2 text-white font-medium">
-                “What made you smile today?”
-              </p>
-
-              <button
-                onClick={() => router.push('/chat')}
-                className="mt-4 bg-white text-black px-4 py-2 rounded-full"
-              >
-                Reply to Her
-              </button>
-            </div>
-          </section>
-
-          {/* Direct messages */}
-          {showDM && (
-            <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
-              <div className="w-full h-full md:w-[400px] md:h-[700px] bg-gray-900 p-4 overflow-y-auto relative">
-                <h2 className="text-xl font-bold mb-4">Direct Messages</h2>
-                {isTyping && (
-                  <div className="mb-4 text-gray-400 italic">
-                    Nova is typing<span className="animate-pulse">...</span>
-                  </div>
-                )}
-
-                {messages.length === 0 && (
-                  <p className="text-gray-400">No messages yet.</p>
-                )}
-
-                {messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className="mb-4 p-3 rounded-lg bg-pink-600 text-white max-w-[80%]"
-                  >
-                    {msg.content}
-                  </div>
-                ))}
+                <p className="mt-2 text-white font-medium">
+                  “What made you smile today?”
+                </p>
 
                 <button
-                  onClick={() => setShowDM(false)}
-                  className="absolute top-4 right-4 text-xl"
+                  onClick={() => router.push('/chat')}
+                  className="mt-4 bg-white text-black px-4 py-2 rounded-full"
                 >
-                  ✕
+                  Reply to Her
                 </button>
               </div>
-            </div>
-          )}
-          {toast && (
-            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-full shadow-lg animate-fade-in-out z-[999]">
-              {toast}
-            </div>
-          )}
+            </section>
+
+            {/* Direct messages */}
+            {showDM && (
+              <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+                <div className="w-full h-full md:w-[400px] md:h-[700px] bg-gray-900 p-4 overflow-y-auto relative">
+                  <h2 className="text-xl font-bold mb-4">Direct Messages</h2>
+                  {isTyping && (
+                    <div className="mb-4 text-gray-400 italic">
+                      Nova is typing<span className="animate-pulse">...</span>
+                    </div>
+                  )}
+
+                  {messages.length === 0 && (
+                    <p className="text-gray-400">No messages yet.</p>
+                  )}
+
+                  {messages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      className="mb-4 p-3 rounded-lg bg-pink-600 text-white max-w-[80%]"
+                    >
+                      {msg.content}
+                    </div>
+                  ))}
+
+                  <button
+                    onClick={() => setShowDM(false)}
+                    className="absolute top-4 right-4 text-xl"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            )}
+            {toast && (
+              <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-full shadow-lg animate-fade-in-out z-[999]">
+                {toast}
+              </div>
+            )}
+          </div>
         </main>
       )}
     </>
