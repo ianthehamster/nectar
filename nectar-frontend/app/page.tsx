@@ -492,14 +492,14 @@ export default function Home() {
               <h2 className="text-lg font-semibold mb-4">Daily Moment</h2>
 
               <div className="bg-gradient-to-r from-pink-600/20 to-purple-600/20 p-5 rounded-xl">
-                <p className="text-gray-300">Nova asks:</p>
+                <p className="text-gray-400">Nova misses you..</p>
 
                 <p className="mt-2 text-white font-medium">
-                  “What made you smile today?”
+                  “Will I ever talk to you soon?”
                 </p>
 
                 <button
-                  onClick={() => router.push('/chat')}
+                  onClick={() => router.push('/chat/1')}
                   className="mt-4 bg-white text-black px-4 py-2 rounded-full"
                 >
                   Reply to Her
