@@ -7,8 +7,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o app ./cmd
+RUN CGO_ENABLED=0 go build -o app ./cmd
 
 EXPOSE 8080
-
 CMD ["./app"]

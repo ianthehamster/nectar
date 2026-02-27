@@ -3,6 +3,3 @@ builder = "DOCKERFILE"
 
 [deploy]
 startCommand = "./app"
-
-[env]
-PORT = "8080"
