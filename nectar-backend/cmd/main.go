@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	log.Println("SERVER BOOTING")
+	log.Println("I AM ALIVE")
 	// err := db.Connect()
 	// if err != nil {
 	// 	log.Fatal("Database connection failed:", err)
@@ -35,6 +35,5 @@ router.GET("/", func(c *gin.Context) {
 		router.POST("/messages/stream", handlers.StreamMessage)
 
 
-port := "8080"
-router.Run("0.0.0.0:" + port)
+router.Run("0.0.0.0:8080")
 }
