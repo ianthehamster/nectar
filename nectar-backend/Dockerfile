@@ -2,14 +2,11 @@ FROM golang:1.23-alpine
 
 WORKDIR /app
 
-# Copy go mod files from nectar-backend
-COPY nectar-backend/go.mod nectar-backend/go.sum ./
+COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy backend source
-COPY nectar-backend/ .
+COPY . .
 
-# Build binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app ./cmd
 
 EXPOSE 8080
