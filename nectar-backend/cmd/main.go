@@ -19,6 +19,10 @@ func main() {
 router := gin.Default()
 router.Use(cors.Default())
 
+router.GET("/", func(c *gin.Context) {
+  c.JSON(200, gin.H{"ok": true})
+})
+
 	router.GET("/companions", handlers.GetCompanions)
 
 	
@@ -36,5 +40,6 @@ router.Use(cors.Default())
 if port == "" {
   port = "8080"
 }
+log.Println("Starting server on", "0.0.0.0:"+port)
 router.Run("0.0.0.0:" + port)
 }
