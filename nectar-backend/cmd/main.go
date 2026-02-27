@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"nectar-backend/internal/handlers"
-	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -36,10 +35,6 @@ router.GET("/", func(c *gin.Context) {
 		router.POST("/messages/stream", handlers.StreamMessage)
 
 
-	port := os.Getenv("PORT")
-if port == "" {
-  port = "8080"
-}
-log.Println("Starting server on", "0.0.0.0:"+port)
+port := "8080"
 router.Run("0.0.0.0:" + port)
 }
