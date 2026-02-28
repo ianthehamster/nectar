@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"nectar-backend/internal/db"
 	"nectar-backend/internal/handlers"
 	"os"
 
@@ -11,11 +12,11 @@ import (
 
 func main() {
 	log.Println("I AM ALIVE")
-	// err := db.Connect()
-	// if err != nil {
-	// 	log.Fatal("Database connection failed:", err)
-	// }
 
+	    err := db.Connect()
+    if err != nil {
+        log.Fatal("Database connection failed:", err)
+    }
 router := gin.Default()
 router.Use(cors.Default())
 
